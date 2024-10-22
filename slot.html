@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Slot Machine by Cruz Wootten aka Lil Wikipedia</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            margin: 0 auto;
+            display: block;
+        }
+        #controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #score {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="score">Credits: 1000</div>
+    <div id="controls">
+        <button onclick="spin()" style="font-size: 20px; padding: 10px 20px;">SPIN (Space)</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let score = 1000;
+        const betAmount = 10;
+
+        // Create simple symbol objects
+        const symbols = [
+            { color: 'red', name: 'cherry' },
+            { color: 'yellow', name: 'lemon' },
+            { color: 'orange', name: 'orange' }
+        ];
+
+        class Reel {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.symbols = [
+                    symbols[Math.floor(Math.random() * symbols.length)],
+                    symbols[Math.floor(Math.random() * symbols.length)],
+                    symbols[Math.floor(Math.random() * symbols.length)]
+                ];
+                this.spinning = false;
+            }
+
+            draw() {
+                for (let i = 0; i < 3; i++) {
+                    ctx.fillStyle = this.symbols[i].color;
+                    ctx.fillRect(this.x, this.y + (i * 100), 80, 80);
+                }
+            }
+
+            spin() {
+                this.spinning = true;
+                this.spinInterval = setInterval(() => {
+                    this.symbols = this.symbols.map(() => 
+                        symbols[Math.floor(Math.random() * symbols.length)]
+                    );
+                }, 100);
+
+                setTimeout(() => {
+                    clearInterval(this.spinInterval);
+                    this.spinning = false;
+                }, 2000 + Math.random() * 1000);
+            }
+        }
+
+        // Create reels
+        const reels = [
+            new Reel(50, 100),
+            new Reel(300, 100),
+            new Reel(550, 100)
+        ];
+
+        function checkWin() {
+            let winAmount = 0;
+            
+            // Check rows
+            for (let row = 0; row < 3; row++) {
+                const rowSymbols = reels.map(reel => reel.symbols[row].name);
+                if (rowSymbols.every(symbol => symbol === rowSymbols[0])) {
+                    winAmount += 50;
+                }
+            }
+
+            // Check diagonals
+            const diagonal1 = reels.map((reel, i) => reel.symbols[i].name);
+            const diagonal2 = reels.map((reel, i) => reel.symbols[2-i].name);
+            
+            if (diagonal1.every(symbol => symbol === diagonal1[0])) winAmount += 100;
+            if (diagonal2.every(symbol => symbol === diagonal2[0])) winAmount += 100;
+            
+            return winAmount;
+        }
+
+        function spin() {
+            if (reels.some(reel => reel.spinning)) return;
+            if (score < betAmount) {
+                alert("Not enough credits!");
+                return;
+            }
+
+            score -= betAmount;
+            updateScore();
+            
+            reels.forEach(reel => reel.spin());
+            
+            setTimeout(() => {
+                const winAmount = checkWin();
+                if (winAmount > 0) {
+                    score += winAmount;
+                    alert(`You won ${winAmount} credits!`);
+                }
+                updateScore();
+            }, 3500);
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = `Credits: ${score}`;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            reels.forEach(reel => reel.draw());
+            requestAnimationFrame(draw);
+        }
+
+        // Start the game
+        draw();
+
+        // Handle space bar
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                spin();
+            }
+        });
+    </script>
+</body>
+</html>
