@@ -1,12 +1,12 @@
 # TODO
 ***
-## 1
+## 1 DONE
 ### Find sprites to swap in for colored squared, ensure size
 
-## 2
+## 2 DONE
 ### Reconfigure win message to be drawn on canvas instead of having pop-up
 
-## 3
+## 3 DONE
 ### Adjust UI size/layout/ add titling/ more information to end user
 
 ## 4
