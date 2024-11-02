@@ -12,5 +12,5 @@
 ## 4
 ### Add a bonus of some sort to be triggered by play or ar random
 
-## 5
+## 5 DONE
 ### Add additional static canvas that displays paylines and win amount associated with
